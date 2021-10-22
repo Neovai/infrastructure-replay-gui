@@ -4,4 +4,4 @@
 	Changes:
 		removed video capabilities
 		added directory with test data
-	
+		edited time display
