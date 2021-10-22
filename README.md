@@ -1,4 +1,4 @@
-# Data visualization for Grasping
+# infrastructure-replay-gui 
 	to run: python3 Control_plane_window.py
 	changes made from https://github.com/OSUrobotics/Simulation-Grasping-GUI 
 	Changes:
