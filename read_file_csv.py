@@ -7,6 +7,7 @@ def read_file(path, type):
     lst = np.loadtxt(path, delimiter=",", skiprows=0)
     rows, cols = np.shape(lst)
     angle = []
+    data_filter = 10
     if type == 'door':
         sensor = np.zeros((rows, cols-2))
         n = 2
@@ -15,12 +16,15 @@ def read_file(path, type):
         n = 4
     time = []
     j = 0
-    for date in lst:
+    for data in lst:
         sensor_cols = []
-        angle.append(date[0])
-        time.append(date[-1])
-        for i in range(len(date)-n):
-            sensor_cols.append(date[i+1])
+        angle.append(data[0])
+        time.append(data[-1])
+        for i in range(len(data)-n):
+            if(data[i+1] < data_filter):
+                sensor_cols.append(0)
+            else:
+                sensor_cols.append(data[i+1])
         sensor[j, :] = sensor_cols
         j = j + 1
     return angle, sensor, time

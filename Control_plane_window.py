@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from read_file_csv import read_file
+from math import pow
+from time import sleep
+from datetime import datetime
 from Force_graph_window import ForceWindow
 from TD_window import TDWindow
 from THD_window import THD_window
@@ -43,9 +46,12 @@ class ControlPlane(QWidget):
         self.time = []
         self.data = []
         self.range = 0
+        self.msPerFrame = 0
 
         self.step = 0
         self.timer = QTimer()
+        self.timer.setTimerType(Qt.PreciseTimer)
+        print(self.timer.timerType())
         self.timer.timeout.connect(self.update_func)
 
         self.openfile = QPushButton('Open Folder', self)
@@ -63,7 +69,7 @@ class ControlPlane(QWidget):
         self.slid_button = QSlider(Qt.Horizontal)
         self.slid_button.setRange(0, 1000)
         self.slid_button.setSingleStep(1)
-        self.slid_button.setValue(0)
+        self.slid_button.setValue(1)
 
         self.sensor_num = QLabel('Sensor: ')
         self.sensor_num.setAlignment(Qt.AlignCenter)
@@ -73,7 +79,8 @@ class ControlPlane(QWidget):
         self.f_label.setAlignment(Qt.AlignCenter)
         left_side_layout.addWidget(self.f_label)
 
-        self.t_label = QLabel('Time: ' + '0.000 ' + 'Sec')
+        #self.t_label = QLabel('Time: ' + '0.000 ' + 'Sec')
+        self.t_label = QLabel('Frame: ' + '0')
         self.t_label.setAlignment(Qt.AlignCenter)
         left_side_layout.addWidget(self.t_label)
 
@@ -145,7 +152,11 @@ class ControlPlane(QWidget):
         else:
             self.model_type = 'None'
         self.angle, self.data, self.time = read_file(path_data, self.model_type)
-        self.slid_button.setRange(0, len(self.time) - 1)
+        totalTime = (self.time[len(self.time)-1] - self.time[0]) / pow(10,6) #in ms
+        self.msPerFrame = totalTime / len(self.time)
+        print(totalTime)
+        print(self.msPerFrame)
+        self.slid_button.setRange(0, len(self.time) - 1) #length of data, not time!
         ControlPlane.sensor_window = ForceWindow(self.angle, self.data, self.time)
         ControlPlane.color_window = TDWindow(self.angle, self.data, self.time, self.model_type)
         ControlPlane.th_window = THD_window(self.angle, self.data, self.time, self.model_type)
@@ -245,7 +256,8 @@ class ControlPlane(QWidget):
         sen_num = re.sub(r'Sensor: ', '', num)
         value = self.slid_button.value()
         time_value, force_value = self.data_update(value, int(sen_num) - 1)
-        self.t_label.setText('{0}: {1:.3f} {2}'.format('Time', (time_value * 0.1), 'Sec'))
+        #self.t_label.setText('{0}: {1:.3f} {2}'.format('Time', (time_value * 0.1), 'Sec'))
+        self.t_label.setText('{0}: {1}'.format('Frame', (time_value)))
         self.f_label.setText('{0}: {1:.3f} {2}'.format('Force', force_value, 'N'))
         if self.model_type == 'drawer':
             self.ds_label.setText('{0}: {1:.3f} {2}'.format('Distance', self.angle[value], 'mm'))
@@ -260,10 +272,12 @@ class ControlPlane(QWidget):
         #ControlPlane.video_window.play_video(step=value)
 
     def update_func(self):
+        #d1 = datetime.now()
         num = self.sensor_num.text()
         sen_num = re.sub(r'Sensor: ', '', num)
         time_value, force_value = self.data_update(self.step, int(sen_num) - 1)
-        self.t_label.setText('{0}: {1:.3f} {2}'.format('Time', (time_value * 0.1), 'Sec'))
+        #self.t_label.setText('{0}: {1:.3f} {2}'.format('Time', (time_value * 0.1), 'Sec'))
+        self.t_label.setText('{0}: {1}'.format('Frame', (time_value)))
         self.f_label.setText('{0}: {1:.3f} {2}'.format('Force', force_value, 'N'))
         if self.model_type == 'drawer':
             self.ds_label.setText('{0}: {1:.3f} {2}'.format('Distance', self.angle[self.step], 'mm'))
@@ -279,12 +293,15 @@ class ControlPlane(QWidget):
             self.step += 1
         else:
             self.step = 0
+        #print(datetime.now() - d1)
+
 
     def start_stop_func(self):
         if not self.timer.isActive():
             self.buttonstart.setText('Stop')
-            # platrate = int(1000 / 60)
-            self.timer.start(16)
+            self.timer.setInterval(self.msPerFrame) #works in theory, but can't update quick enough?
+            self.timer.start()
+            #self.timer.start(self.msPerFrame) #change with sec per frame constant. was 16
         else:
             self.buttonstart.setText('Start')
             self.timer.stop()
