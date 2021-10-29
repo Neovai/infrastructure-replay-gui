@@ -1,7 +1,7 @@
 # infrastructure-replay-gui 
 changes made from https://github.com/OSUrobotics/Simulation-Grasping-GUI 
-	to run: python3 Control_plane_window.py
 	
+	To run: python3 Control_plane_window.py
 	Changes:
 		removed video capabilities
 		added directory with test data
