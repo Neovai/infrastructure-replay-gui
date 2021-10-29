@@ -283,11 +283,11 @@ class ControlPlane(QWidget):
             self.ds_label.setText('{0}: {1:.3f} {2}'.format('Distance', self.angle[self.step], 'mm'))
         else:
             self.r_label.setText('{0}: {1:.3f} {2}'.format('Rotate Plate', self.angle[self.step], 'Degrees'))
-        ControlPlane.sensor_window.draw(num=int(sen_num) - 1, t=self.step)
-        ControlPlane.color_window.draw(num=self.step)
-        ControlPlane.th_window.widget.changecolor(num=self.step)
-        ControlPlane.th_window.widget.setDRotation(num=self.step)
-        ControlPlane.th_window.widget.setTranslate(num=self.step)
+        # ControlPlane.sensor_window.draw(num=int(sen_num) - 1, t=self.step)
+        # ControlPlane.color_window.draw(num=self.step)
+        # ControlPlane.th_window.widget.changecolor(num=self.step)
+        # ControlPlane.th_window.widget.setDRotation(num=self.step)
+        # ControlPlane.th_window.widget.setTranslate(num=self.step)
         #ControlPlane.video_window.play_video(step=self.step)
         if self.step < len(self.time) - 1:
             self.step += 1

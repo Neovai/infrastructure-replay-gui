@@ -7,7 +7,6 @@ from matplotlib.figure import Figure
 class ForceWindow(QWidget):
     def __init__(self, angle, data, time):
         super(ForceWindow, self).__init__()
-        # path = 'C:/Users/Haonan Yuan/Documents/Oregon state University/Python_workspace/Interface_door_PyQT/Door/5.csv'
         self.angle = angle
         self.sensor = data
         self.time = time
